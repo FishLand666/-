@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>《战双：帕弥什》豆芽杯竞技组排行榜单</title>
+    <style>
+        :root {
+            --primary-color: #1a0a2a;
+            --secondary-color: #3a1a5a;
+            --accent-color: #ff66b2;
+            --text-light: #f0e0ff;
+            --text-dark: #1a1a1a;
+            --danger-color: #ff4757;
+            --lilith-pink: #ff66b2;
+            --lilith-purple: #b366ff;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            background-image: url('https://uploadstatic.mihoyo.com/pgr/static/images/bg.png');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(26, 10, 42, 0.9);
+            box-shadow: 0 0 20px rgba(255, 102, 178, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--lilith-pink);
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--lilith-pink);
+            margin-bottom: 30px;
+            background: linear-gradient(to right, transparent, rgba(255, 102, 178, 0.2), transparent);
+            position: relative;
+        }
+        
+        h1 {
+            color: var(--lilith-pink);
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(255, 102, 178, 0.5);
+            margin: 0;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        h2 {
+            color: var(--lilith-pink);
+            border-left: 4px solid var(--lilith-purple);
+            padding-left: 10px;
+            text-shadow: 0 0 5px rgba(179, 102, 255, 0.5);
+            font-weight: bold;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background-color: rgba(58, 26, 90, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(179, 102, 255, 0.3);
+            border: 1px solid var(--lilith-purple);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .panel::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,102,178,0.1) 0%, rgba(179,102,255,0.1) 100%);
+            pointer-events: none;
+        }
+        
+        .contestant-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 102, 178, 0.3);
+        }
+        
+        .contestant-card:hover {
+            background-color: rgba(255, 102, 178, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(179, 102, 255, 0.3);
+        }
+        
+        .contestant-info {
+            flex: 1;
+        }
+        
+        .contestant-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--lilith-pink);
+            font-size: 1.1rem;
+        }
+        
+        .contestant-points {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+        
+        .vote-btn {
+            background: linear-gradient(to right, var(--lilith-pink), var(--lilith-purple));
+            color: var(--text-dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 102, 178, 0.5);
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .vote-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(179, 102, 255, 0.5);
+        }
+        
+        .vote-btn:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .rank-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(179, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .rank-item:hover {
+            background-color: rgba(179, 102, 255, 0.1);
+        }
+        
+        .rank-number {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #555;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+            border: 1px solid var(--lilith-pink);
+        }
+        
+        .rank-1 .rank-number {
+            background: linear-gradient(to right, gold, #ffcc00);
+            color: var(--text-dark);
+            border: 1px solid gold;
+        }
+        
+        .rank-2 .rank-number {
+            background: linear-gradient(to right, silver, #dddddd);
+            color: var(--text-dark);
+            border: 1px solid silver;
+        }
+        
+        .rank-3 .rank-number {
+            background: linear-gradient(to right, #cd7f32, #e6ac00);
+            color: var(--text-light);
+            border: 1px solid #cd7f32;
+        }
+        
+        .rank-info {
+            flex: 1;
+        }
+        
+        .rank-name {
+            font-weight: bold;
+            color: var(--lilith-pink);
+        }
+        
+        .rank-points {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .user-panel {
+            background: linear-gradient(to right, rgba(58, 26, 90, 0.7), rgba(26, 10, 42, 0.7));
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--lilith-purple);
+            box-shadow: 0 0 10px rgba(179, 102, 255, 0.3);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            color: var(--lilith-pink);
+        }
+        
+        .user-points {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px rgba(255, 102, 178, 0.5);
+        }
+        
+        .login-form {
+            background: rgba(58, 26, 90, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            border: 1px solid var(--lilith-purple);
+            box-shadow: 0 0 20px rgba(179, 102, 255, 0.3);
+        }
+        
+        .login-title {
+            text-align: center;
+            color: var(--lilith-pink);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(255, 102, 178, 0.5);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--lilith-pink);
+            font-weight: bold;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid var(--lilith-purple);
+            background-color: rgba(0, 0, 0, 0.3);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--lilith-pink);
+            box-shadow: 0 0 10px rgba(255, 102, 178, 0.5);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(to right, var(--lilith-pink), var(--lilith-purple));
+            color: var(--text-dark);
+            border: none;
+            padding: 12px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 102, 178, 0.5);
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(179, 102, 255, 0.7);
+        }
+        
+        .logout-btn {
+            background: linear-gradient(to right, #ff4757, #e74c3c);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.7);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(to right, var(--lilith-pink), var(--lilith-purple));
+            color: var(--text-dark);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(179, 102, 255, 0.5);
+            z-index: 1000;
+            animation: slideIn 0.3s, fadeOut 0.5s 2.5s forwards;
+            font-weight: bold;
+            border: 1px solid white;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .lilith-quote {
+            font-style: italic;
+            color: var(--lilith-pink);
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 0 0 5px rgba(255, 102, 178, 0.5);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>《战双：帕弥什》豆芽杯竞技组排行榜单</h1>
+            <div class="lilith-quote">"为您心目中能夺得金冠的指挥官投票吧，就让我看看，谁的额度最丰厚呢？"</div>
+        </header>
+        
+        <!-- 登录表单 -->
+        <div id="loginSection" class="login-form">
+            <div class="login-title">空中花园指挥官认证系统</div>
+            <div class="form-group">
+                <label for="username">指挥官代号</label>
+                <input type="text" id="username" class="form-control" placeholder="请输入您的指挥官代号" required>
+            </div>
+            <div class="form-group">
+                <label for="password">认证密钥</label>
+                <input type="password" id="password" class="form-control" placeholder="请输入您的认证密钥" required>
+            </div>
+            <button id="loginBtn" class="submit-btn">身份认证</button>
+            <div id="loginError" style="color: #ff6b6b; text-align: center; margin-top: 15px; font-weight: bold;"></div>
+            <div class="lilith-quote" style="margin-top: 20px;">"不用担心，只要输入您的代号和密钥，自动就会帮您匹配您在空中花园认证的信息，怎么样，要来赌赌看谁会赢吗？我不会出千的（笑）"</div>
+        </div>
+        
+        <!-- 主内容区域 (登录后显示) -->
+        <div id="mainContent" class="hidden">
+            <!-- 用户信息面板 -->
+            <div class="user-panel">
+                <div class="user-info">
+                    <div>
+                        <div class="user-name" id="userDisplayName">指挥官</div>
+                        <div class="user-points">剩余积分: <span id="userPoints">100</span></div>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="logout-btn">登出系统</button>
+            </div>
+            
+            <div class="grid-container">
+                <!-- 投票区 -->
+                <div class="panel">
+                    <h2>为您心目中能夺得金冠的指挥官投票吧</h2>
+                    <div class="lilith-quote">"下注要趁早哦~看看哪位选手能赢得指挥官阁下的青睐呢？"</div>
+                    <div id="contestantsList">
+                        <!-- 选手列表将在这里动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 排行榜 -->
+                <div class="panel">
+                    <h2>实时排行榜</h2>
+                    <div class="lilith-quote">"当前的局势真是令人兴奋~，就让我们看看，谁会笑到最后呢？"</div>
+                    <div id="rankingList">
+                        <!-- 排名列表将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // 初始化数据
+    const VOTE_AMOUNT = 10;
+    const INITIAL_POINTS = 100;
+    
+    // 16位参赛选手
+    let contestants = [
+        { id: 1, name: "露西亚", points: 0 },
+        { id: 2, name: "里", points: 0 },
+        { id: 3, name: "丽芙", points: 0 },
+        { id: 4, name: "七实", points: 0 },
+        { id: 5, name: "渡边", points: 0 },
+        { id: 6, name: "比安卡", points: 0 },
+        { id: 7, name: "库洛姆", points: 0 },
+        { id: 8, name: "神威", points: 0 },
+        { id: 9, name: "艾拉", points: 0 },
+        { id: 10, name: "万事", points: 0 },
+        { id: 11, name: "薇拉", points: 0 },
+        { id: 12, name: "露娜", points: 0 },
+        { id: 13, name: "罗兰", points: 0 },
+        { id: 14, name: "赛琳娜", points: 0 },
+        { id: 15, name: "卡列尼娜", points: 0 },
+        { id: 16, name: "哈卡玛", points: 0 }
+    ];
+    
+    // 当前用户数据
+    let currentUser = null;
+    let userPoints = INITIAL_POINTS;
+    
+    // DOM元素
+    const loginSection = document.getElementById('loginSection');
+    const mainContent = document.getElementById('mainContent');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginError = document.getElementById('loginError');
+    const userDisplayName = document.getElementById('userDisplayName');
+    const userPointsDisplay = document.getElementById('userPoints');
+    const contestantsList = document.getElementById('contestantsList');
+    const rankingList = document.getElementById('rankingList');
+    
+    // 初始化页面
+    window.onload = function() {
+        checkLoginStatus();
+        setupEventListeners();
+    };
+    
+    // 检查登录状态
+    function checkLoginStatus() {
+        const userData = localStorage.getItem('pgrContestCurrentUser');
+        const contestData = localStorage.getItem('pgrContestData');
+        
+        if (userData) {
+            currentUser = JSON.parse(userData);
+            userPoints = currentUser.points || INITIAL_POINTS;
+            
+            if (contestData) {
+                const data = JSON.parse(contestData);
+                contestants = data.contestants || contestants;
+            }
+            
+            showMainContent();
+        }
+    }
+    
+    // 处理登录
+    function handleLogin() {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+        
+        if (!username || !password) {
+            showError("警告：请填写指挥官代号和认证密钥");
+            return;
+        }
+        
+        try {
+            // 获取用户数据
+            const users = JSON.parse(localStorage.getItem('pgrContestUsers') || {});
+            
+            // 检查密码是否正确
+            if (users[username] && users[username].password !== password) {
+                showError("认证失败：密钥不正确");
+                return;
+            }
+            
+            // 新用户注册
+            if (!users[username]) {
+                users[username] = {
+                    password: password,
+                    points: INITIAL_POINTS
+                };
+                
+                localStorage.setItem('pgrContestUsers', JSON.stringify(users));
+                showNotification("欢迎指挥官阁下的大驾光临~ 这是您的100积分，请务必想好要投给谁哦？买定离手~");
+            }
+            
+            // 登录用户
+            currentUser = {
+                username: username,
+                points: users[username].points
+            };
+            
+            localStorage.setItem('pgrContestCurrentUser', JSON.stringify(currentUser));
+            
+            userPoints = currentUser.points;
+            showMainContent();
+            clearError();
+            
+        } catch (e) {
+            console.error("登录错误:", e);
+            showError("系统错误：认证过程中发生异常，请重试");
+        }
+    }
+    
+    // 显示错误信息
+    function showError(message) {
+        loginError.textContent = "✧ " + message;
+    }
+    
+    // 清除错误信息
+    function clearError() {
+        loginError.textContent = '';
+    }
+    
+    // 投票给选手
+    function vote(contestantId) {
+        if (userPoints >= VOTE_AMOUNT) {
+            const contestant = contestants.find(c => c.id === contestantId);
+            if (contestant) {
+                contestant.points += VOTE_AMOUNT;
+                userPoints -= VOTE_AMOUNT;
+                
+                // 更新用户数据
+                currentUser.points = userPoints;
+                localStorage.setItem('pgrContestCurrentUser', JSON.stringify(currentUser));
+                
+                // 更新用户列表
+                const users = JSON.parse(localStorage.getItem('pgrContestUsers') || {});
+                if (users[currentUser.username]) {
+                    users[currentUser.username].points = userPoints;
+                    localStorage.setItem('pgrContestUsers', JSON.stringify(users));
+                }
+                
+                saveContestData();
+                updateUI();
+                
+                showNotification(`我已经替您为${contestant.name}阁下投了10票，看来您选择了这位选手呢`);
+            }
+        } else {
+            showNotification("诶呀呀，指挥官阁下积分不足了呢~就和我一起见证这场赌局的结果吧♡");
+        }
+    }
+    
+    // 保存比赛数据
+    function saveContestData() {
+        const data = {
+            contestants: contestants,
+            lastUpdated: new Date().toISOString()
+        };
+        localStorage.setItem('pgrContestData', JSON.stringify(data));
+    }
+    
+    // 更新用户界面
+    function updateUI() {
+        // 更新用户积分显示
+        userPointsDisplay.textContent = userPoints;
+        userDisplayName.textContent = currentUser.username;
+        
+        // 更新选手列表
+        contestantsList.innerHTML = '';
+        
+        contestants.forEach(contestant => {
+            const card = document.createElement('div');
+            card.className = 'contestant-card';
+            card.innerHTML = `
+                <div class="contestant-info">
+                    <div class="contestant-name">${contestant.name}</div>
+                    <div class="contestant-points">当前积分: ${contestant.points}</div>
+                </div>
+                <button class="vote-btn" onclick="vote(${contestant.id})" ${userPoints < VOTE_AMOUNT ? 'disabled' : ''}>
+                    投10分
+                </button>
+            `;
+            contestantsList.appendChild(card);
+        });
+        
+        // 更新排名
+        updateRanking();
+    }
+    
+    // 更新排名
+    function updateRanking() {
+        // 按积分排序
+        const sorted = [...contestants].sort((a, b) => b.points - a.points);
+        
+        rankingList.innerHTML = '';
+        
+        sorted.forEach((contestant, index) => {
+            const rankItem = document.createElement('div');
+            rankItem.className = `rank-item rank-${index + 1}`;
+            rankItem.innerHTML = `
+                <div class="rank-number">${index + 1}</div>
+                <div class="rank-info">
+                    <div class="rank-name">${contestant.name}</div>
+                    <div class="rank-points">${contestant.points}分</div>
+                </div>
+            `;
+            rankingList.appendChild(rankItem);
+        });
+    }
+    
+    // 显示通知
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `✧ ${message}`;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+    
+    // 显示主内容
+    function showMainContent() {
+        loginSection.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+        updateUI();
+    }
+    
+    // 显示登录表单
+    function showLoginForm() {
+        loginSection.classList.remove('hidden');
+        mainContent.classList.add('hidden');
+        usernameInput.value = '';
+        passwordInput.value = '';
+    }
+    
+    // 处理退出登录
+    function handleLogout() {
+        localStorage.removeItem('pgrContestCurrentUser');
+        currentUser = null;
+        showLoginForm();
+        showNotification("期待指挥官下次再来玩哦~♡");
+    }
+    
+    // 设置事件监听器
+    function setupEventListeners() {
+        loginBtn.addEventListener('click', handleLogin);
+        logoutBtn.addEventListener('click', handleLogout);
+        
+        // 添加回车键登录支持
+        [usernameInput, passwordInput].forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>
